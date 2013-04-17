@@ -54,6 +54,12 @@ def get_message_by_type(msg, type):
     if type == "tenki":
         return get_tenki(msg)
 
+    if type == "unko":
+        return get_unko(msg)
+
+    if type == "jisin":
+        return get_jisin(msg)
+
     if type == "kacho":
         return get_kacho()
 
@@ -232,13 +238,12 @@ def get_snap(msg):
 
     return u" 今日のスナップ " + today + "\n\n" + name + u"\n" + fashion_point + u"\n\n" + fashion_point_detail + u"\n" + todays_snap_url + u"\n"
 
+# 今日の天気
 def get_tenki(msg):
     url = "http://weather.excite.co.jp/area/ar-4410/"
     fd = urllib.urlopen(url)
     s = fd.read().decode('utf-8')
     xRoot = lxml.html.fromstring(s)
-
-    # 今日の天気を取得
     x = xRoot.xpath('//*[@id="todayWeather"]/p')
     todays_tenki = x[0].text
     x = xRoot.xpath('//*[@id="todayWeather"]/div[1]/p/text()[1]')
@@ -246,12 +251,32 @@ def get_tenki(msg):
 
     return todays_date + todays_tenki 
 
+# 運行情報
+def get_unko(msg):
+    url = "http://www.tokyometro.jp/unkou/"
+    fd = urllib.urlopen(url)
+    s = fd.read().decode('utf-8')
+    xRoot = lxml.html.fromstring(s)
+    x = xRoot.xpath('//*[@id="mainArea"]/div[1]/div/div/div/div/div[2]/table/tbody/tr[4]/td[2]/p')
+    return u" (開発中) "
+
+# 地震
+def get_jisin(msg):
+    url = "http://www.jma.go.jp/jp/quake/quake_singen_index.html"
+    fd = urllib.urlopen(url)
+    s = fd.read().decode('utf-8')
+    xRoot = lxml.html.fromstring(s)
+    x = xRoot.xpath('//*[@id="info"]/table/tbody/tr[2]/td[4]')
+    return u" (開発中) "
+
 def get_help():
     return """
 #help       使い方を返します。
 #uranai     あなたの今日の占いを返します。
 #snap       今日のsnapを返します。
 #tenki      今日の天気を返します。
+#unko       電車の運行情報を返します。
+#jisin      地震情報を返します。
 #kacho      課長
 skype_id++  インクリメントします。
 skype_id--  デクリメントします。
@@ -272,6 +297,12 @@ def get_type(msg):
 
     if msg.Body[0:] == "#tenki":
         return "tenki"
+
+    if msg.Body[0:] == "#unko":
+        return "unko"
+
+    if msg.Body[0:] == "#jisin":
+        return "jisin"
 
     if msg.Body[0:] == "#kacho":
         return "kacho"
