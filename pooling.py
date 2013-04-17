@@ -51,6 +51,9 @@ def get_message_by_type(msg, type):
     if type == "snap":
         return get_snap(msg)
 
+    if type == "tenki":
+        return get_tenki(msg)
+
     if type == "kacho":
         return get_kacho()
 
@@ -229,11 +232,26 @@ def get_snap(msg):
 
     return u" 今日のスナップ " + today + "\n\n" + name + u"\n" + fashion_point + u"\n\n" + fashion_point_detail + u"\n" + todays_snap_url + u"\n"
 
+def get_tenki(msg):
+    url = "http://weather.excite.co.jp/area/ar-4410/"
+    fd = urllib.urlopen(url)
+    s = fd.read().decode('utf-8')
+    xRoot = lxml.html.fromstring(s)
+
+    # 今日の天気を取得
+    x = xRoot.xpath('//*[@id="todayWeather"]/p')
+    todays_tenki = x[0].text
+    x = xRoot.xpath('//*[@id="todayWeather"]/div[1]/p/text()[1]')
+    todays_date = x[0]
+
+    return todays_date + todays_tenki 
+
 def get_help():
     return """
 #help       使い方を返します。
 #uranai     あなたの今日の占いを返します。
 #snap       今日のsnapを返します。
+#tenki      今日の天気を返します。
 #kacho      課長
 skype_id++  インクリメントします。
 skype_id--  デクリメントします。
@@ -251,6 +269,9 @@ def get_type(msg):
 
     if msg.Body[0:] == "#snap":
         return "snap"
+
+    if msg.Body[0:] == "#tenki":
+        return "tenki"
 
     if msg.Body[0:] == "#kacho":
         return "kacho"
